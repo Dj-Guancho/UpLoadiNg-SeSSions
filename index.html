@@ -3,109 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sesiones de sótano y otros eventos</title>
+    <title>Sesiones de sótano</title>
+    <!-- Iconos de FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #ff0055;
+            --primary-hover: #e0004c;
+            --bg-dark: #0f0f12;
+            --bg-card: #18181c;
+            --bg-track: #232329;
+            --bg-track-hover: #2d2d35;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a8;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            min-height: 100vh;
         }
-        h1 {
-            color: #ff0055;
-            margin-bottom: 20px;
-        }
-        .container {
+
+        header {
+            background: linear-gradient(135deg, #18181c 0%, #0f0f12 100%);
+            padding: 25px 40px;
+            border-bottom: 1px solid #232329;
             display: flex;
-            flex-direction: row;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header h1 span {
+            color: var(--primary);
+        }
+
+        .main-layout {
+            display: flex;
+            flex: 1;
+            padding: 30px;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
             width: 100%;
-            max-width: 1200px;
+            box-sizing: border-box;
+        }
+
+        /* Contenedor del Reproductor (Izquierda) */
+        .player-section {
+            flex: 1.4;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
         }
-        .playlist {
-            flex: 1;
-            background: #1e1e1e;
-            padding: 15px;
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+            background-color: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #232329;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .now-playing-info {
+            background-color: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #232329;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .now-playing-meta h2 {
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+        }
+
+        .now-playing-meta p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .btn-download {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        .playlist h2 {
-            font-size: 1.2rem;
-            margin-top: 0;
-            border-bottom: 2px solid #ff0055;
-            padding-bottom: 5px;
-        }
-        .track {
-            padding: 10px;
-            margin: 5px 0;
-            background: #2a2a2a;
-            border-radius: 4px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
         }
-        .track:hover {
-            background: #ff0055;
+
+        .btn-download:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
         }
-        .player-box {
-            flex: 2;
-            background: #1e1e1e;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+
+        .btn-download:active {
+            transform: translateY(0);
+        }
+
+        /* Contenedor de la Lista (Derecha) */
+        .playlist-section {
+            flex: 1;
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #232329;
             display: flex;
             flex-direction: column;
+            max-height: 750px;
+        }
+
+        .playlist-section h3 {
+            margin: 0 0 20px 0;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tracks-list {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 5px;
+        }
+
+        /* Estilo del Scrollbar */
+        .tracks-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .tracks-list::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .track-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background-color: var(--bg-track);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .track-card:hover {
+            background-color: var(--bg-track-hover);
+            border-color: #383842;
+        }
+
+        .track-card.active {
+            background-color: rgba(255, 0, 85, 0.1);
+            border-color: var(--primary);
+        }
+
+        .artwork-wrapper {
+            position: relative;
+            width: 55px;
+            height: 55px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #121214;
+            flex-shrink: 0;
+            display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 400px;
         }
-        iframe {
+
+        .artwork-img {
             width: 100%;
-            height: 450px;
-            border: none;
-            border-radius: 4px;
-            background: #000;
+            height: 100%;
+            object-fit: cover;
         }
-        @media (max-width: 768px) {
-            .container {
+
+        .artwork-placeholder {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .track-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .track-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-genre {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .play-indicator {
+            color: var(--primary);
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .track-card.active .play-indicator {
+            opacity: 1;
+        }
+
+        @media (max-width: 992px) {
+            .main-layout {
                 flex-direction: column;
+            }
+            .playlist-section {
+                max-height: none;
             }
         }
     </style>
 </head>
 <body>
 
-    <h1>Mis Sesiones</h1>
+    <header>
+        <i class="fa-solid fa-compact-disc fa-spin fa-2xl" style="color: var(--primary);"></i>
+        <h1>Mis <span>Sesiones</span></h1>
+    </header>
     
-    <div class="container">
-        <!-- Lista de Sesiones -->
-        <div class="playlist">
-            <h2>Selecciona una sesión</h2>
-            <!-- REPLAZA los atributos data-url con tus enlaces de tipo /embed/ de MEGA -->
-            <div class="track" data-url="https://mega.nz/embed/NdoQDQ7S#vS7jYwDqS20W52q3n_jwc2kyuhYsBs-UUvzcNxkrgyE!1v1c">2026-10-15_Aserrín_6</div>
-            <div class="track" data-url="https://mega.nz/file/MBRiRCwD#w0LPH38nEWIGHAWn9nEe_pg6AQjceugillSrDM0NcV0">Sesión 2 - Techno serrin</div>
-            <div class="track" data-url="https://mega.nz/embed/NdoQDQ7S#vS7jYwDqS20W52q3n_jwc2kyuhYsBs-UUvzcNxkrgy">Sesión 3 - House Set</div>
+    <div class="main-layout">
+        <!-- ZONA IZQUIERDA: REPRODUCTOR E INFO -->
+        <div class="player-section">
+            <div class="video-container">
+                <!-- Pantalla de bienvenida / Iframe del reproductor -->
+                <iframe id="mega-player" src="" allowfullscreen></iframe>
+            </div>
+
+            <div class="now-playing-info" id="info-box" style="display: none;">
+                <div class="now-playing-meta">
+                    <h2 id="current-title">Selecciona una sesión</h2>
+                    <p id="current-genre">Género / Descripción</p>
+                </div>
+                <!-- Botón de Descarga Dinámico -->
+                <a href="#" id="btn-download" target="_blank" class="btn-download">
+                    <i class="fa-solid fa-arrow-down"></i> Descargar Sesión
+                </a>
+            </div>
         </div>
 
-        <!-- Reproductor -->
-        <div class="player-box">
-            <iframe id="mega-player" src="" allowfullscreen></h2>Selecciona una sesión de la lista para comenzar a reproducir.</iframe>
+        <!-- ZONA DERECHA: PLAYLIST CON CARÁTULAS -->
+        <div class="playlist-section">
+            <h3>Tu Biblioteca</h3>
+            <div class="tracks-list">
+                
+                <!-- TARJETA 1 -->
+                <!-- Cambia data-embed por el enlace de stream y data-download por el enlace normal de descarga de MEGA -->
+                <div class="track-card" 
+                     data-embed="https://mega.nz/embed/cJRD2TAC#YsZwLqsWXAIMoKlfedHKHTYLO8rWWfvSX0q_9AgijWQ!1v1c" 
+                     data-download="https://mega.nz/file/cJRD2TAC#YsZwLqsWXAIMoKlfedHKHTYLO8rWWfvSX0q_9AgijWQ"
+                     data-title="Remember sonido Valenciano 1991"
+                     data-genre="A vinilo puro, duración: 49minutos ">
+                    <div class="artwork-wrapper">
+                        <!-- Coloca aquí el link de tu carátula (puedes subir la foto a GitHub también) -->
+                        <!-- Si no hay foto, se usará el icono musical por defecto -->
+                        <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=150&auto=format&fit=crop&q=60" alt="Carátula" class="artwork-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="artwork-placeholder" style="display:none;"><i class="fa-solid fa-music"></i></div>
+                    </div>
+                    <div class="track-details">
+                        <div class="track-title">Techno Intro Mix 2026</div>
+                        <div class="track-genre">Techno / Peak Time</div>
+                    </div>
+                    <div class="play-indicator"><i class="fa-solid fa-volume-high"></i></div>
+                </div>
+
+                <!-- TARJETA 2 -->
+                <div class="track-card" 
+                     data-embed="https://mega.nz/embed/ID_EJEMPLO_2#CLAVE_2" 
+                     data-download="https://mega.nz/file/ID_EJEMPLO_2#CLAVE_2"
+                     data-title="Deep House Sunset"
+                     data-genre="Deep House / Melodic">
+                    <div class="artwork-wrapper">
+                        <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=150&auto=format&fit=crop&q=60" alt="Carátula" class="artwork-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="artwork-placeholder" style="display:none;"><i class="fa-solid fa-music"></i></div>
+                    </div>
+                    <div class="track-details">
+                        <div class="track-title">Deep House Sunset</div>
+                        <div class="track-genre">Deep House / Melodic</div>
+                    </div>
+                    <div class="play-indicator"><i class="fa-solid fa-volume-high"></i></div>
+                </div>
+
+                <!-- TARJETA 3 (Sin imagen de ejemplo, usará el icono automático) -->
+                <div class="track-card" 
+                     data-embed="https://mega.nz/embed/ID_EJEMPLO_3#CLAVE_3" 
+                     data-download="https://mega.nz/file/ID_EJEMPLO_3#CLAVE_3"
+                     data-title="Tech House Club Session"
+                     data-genre="Tech House">
+                    <div class="artwork-wrapper">
+                        <img src="" alt="Carátula" class="artwork-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="artwork-placeholder"><i class="fa-solid fa-music"></i></div>
+                    </div>
+                    <div class="track-details">
+                        <div class="track-title">Tech House Club Session</div>
+                        <div class="track-genre">Tech House</div>
+                    </div>
+                    <div class="play-indicator"><i class="fa-solid fa-volume-high"></i></div>
+                </div>
+
+            </div>
         </div>
     </div>
 
     <script>
-        const tracks = document.querySelectorAll('.track');
+        const cards = document.querySelectorAll('.track-card');
         const player = document.getElementById('mega-player');
+        const infoBox = document.getElementById('info-box');
+        const currentTitle = document.getElementById('current-title');
+        const currentGenre = document.getElementById('current-genre');
+        const btnDownload = document.getElementById('btn-download');
 
-        tracks.forEach(track => {
-            track.addEventListener('click', () => {
-                const url = track.getAttribute('data-url');
-                player.src = url;
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Quitar clase activa a las demás tarjetas
+                cards.forEach(c => c.classList.remove('active'));
+                
+                // Activar tarjeta actual
+                card.classList.add('active');
+
+                // Obtener datos
+                const embedUrl = card.getAttribute('data-embed');
+                const downloadUrl = card.getAttribute('data-download');
+                const title = card.getAttribute('data-title');
+                const genre = card.getAttribute('data-genre');
+
+                // Cargar en el reproductor e info
+                player.src = embedUrl;
+                currentTitle.textContent = title;
+                currentGenre.textContent = genre;
+                btnDownload.href = downloadUrl;
+
+                // Mostrar la barra de información y descarga
+                infoBox.style.display = 'flex';
             });
         });
     </script>
