@@ -1,2 +1,5 @@
-# Uploaoding-Sesions
-Música de sótano subida de manera aleatoria
+# Uplaoding-Sesions
+Música de sótano, creada a ratos libres, combinando sintetizadores KORG, AKAI y MASCHINE, con mezclas a vinilo puro y DVS mediante TRAKTOR.
+La mayoría de las veces es improvisación en estado puro.
+Otras son más elaboradas para algún evento....
+Pero las que salen sin más en una tarde cualquiera suenan mucho mejor, aunque no estén depuradas y se note que cabalgan diferentes...   
